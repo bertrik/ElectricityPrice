@@ -52,7 +52,7 @@ static bool fetch_price(void)
 
 void setup(void)
 {
-    snprintf(espid, sizeof(espid), "esp8266-elecpice-%06x", ESP.getChipId());
+    snprintf(espid, sizeof(espid), "esp8266-elecprice-%06x", ESP.getChipId());
 
     Serial.begin(115200);
     Serial.println("\nElectricityPrice");

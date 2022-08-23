@@ -14,13 +14,9 @@ static TFT_eSPI display;
 static TFT_eSprite sprite(&display);
 static char espid[32];
 
-static void display_big(const String & text, int fg = TFT_WHITE, int bg = TFT_BLACK, int border =
-                        TFT_BLUE)
+static void display_big(const String & text, int fg = TFT_WHITE, int bg = TFT_BLACK)
 {
-    Serial.println(text);
-
     sprite.fillSprite(bg);
-    sprite.drawRect(0, 0, display.width(), display.height(), border);
     sprite.setTextFont(4);
     sprite.setTextSize(2);
     sprite.setTextDatum(MC_DATUM);
@@ -112,11 +108,21 @@ void loop(void)
             calculate_quartiles(doc, q1, q2, q3);
             printf("q1=%f,q2=%f,q3=%f\n", q1, q2, q3);
 
-            int border = (price <= q1) ? TFT_GREEN : (price >= q3) ? TFT_RED : TFT_BLUE;
+            int bg, fg;
+            if (price < q1) {
+                bg = TFT_GREEN;
+                fg = TFT_WHITE;
+            } else if (price < q3) {
+                bg = TFT_BLACK;
+                fg = TFT_WHITE;
+            } else {
+                bg = TFT_RED;
+                fg = TFT_WHITE;
+            }
 
             char buffer[16];
             sprintf(buffer, "E%.2f", price / 1000.0);
-            display_big(String(buffer), TFT_WHITE, TFT_BLACK, border);
+            display_big(String(buffer), fg, bg);
         }
     }
 }

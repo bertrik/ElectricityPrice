@@ -1,3 +1,5 @@
+#include <string.h>
+
 #include <Arduino.h>
 
 #include "SPIFFS.h"
@@ -51,22 +53,22 @@ static int compare_float(const void *v1, const void *v2)
     return (*f1 < *f2) ? -1 : (*f1 > *f2) ? 1 : 0;
 }
 
-static bool calculate_quartiles(JsonDocument & doc, float &q1, float &q2, float &q3)
+static void calculate_quartiles(JsonDocument & doc, float &q1, float &q2, float &q3)
 {
     float prices[24];
     int index = 0;
+    int num_elems = sizeof(prices) / sizeof(*prices);
     for (JsonObject item:doc["day-ahead"].as < JsonArray > ()) {
         float price = item["price"];
-        if (index < 24) {
+        if (index < num_elems) {
             prices[index++] = price;
         }
     }
 
-    qsort(prices, 24, sizeof(float), compare_float);
-    q1 = prices[5];
-    q2 = prices[11];
-    q3 = prices[17];
-    return true;
+    qsort(prices, num_elems, sizeof(float), compare_float);
+    q1 = (prices[5] + prices[6]) / 2;
+    q2 = (prices[11] + prices[12]) / 2;
+    q3 = (prices[17] + prices[18]) / 2;
 }
 
 void setup(void)
@@ -106,17 +108,17 @@ void loop(void)
             float price = doc["current"]["price"];
             float q1, q2, q3;
             calculate_quartiles(doc, q1, q2, q3);
-            printf("q1=%f,q2=%f,q3=%f\n", q1, q2, q3);
+            printf("q1=%.2f,q2=%.2f,q3=%.2f\n", q1, q2, q3);
 
             int bg, fg;
             if (price < q1) {
                 bg = TFT_GREEN;
-                fg = TFT_WHITE;
-            } else if (price < q3) {
-                bg = TFT_BLACK;
+                fg = TFT_BLACK;
+            } else if (price > q3) {
+                bg = TFT_RED;
                 fg = TFT_WHITE;
             } else {
-                bg = TFT_RED;
+                bg = TFT_BLACK;
                 fg = TFT_WHITE;
             }
 

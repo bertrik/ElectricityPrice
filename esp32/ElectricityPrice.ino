@@ -56,6 +56,8 @@ static int compare_float(const void *v1, const void *v2)
 static void calculate_quartiles(JsonDocument & doc, float &q1, float &q2, float &q3)
 {
     float prices[24];
+
+    // convert prices into array
     int index = 0;
     int num_elems = sizeof(prices) / sizeof(*prices);
     for (JsonObject item:doc["day-ahead"].as < JsonArray > ()) {
@@ -63,6 +65,10 @@ static void calculate_quartiles(JsonDocument & doc, float &q1, float &q2, float 
         if (index < num_elems) {
             prices[index++] = price;
         }
+    }
+    // pad with 0 if fewer than 24
+    while (index < num_elems) {
+        prices[index++] = 0.0;
     }
 
     qsort(prices, num_elems, sizeof(float), compare_float);

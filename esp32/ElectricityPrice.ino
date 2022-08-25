@@ -19,8 +19,14 @@ static char espid[32];
 static void display_big(const String & text, int fg = TFT_WHITE, int bg = TFT_BLACK)
 {
     sprite.fillSprite(bg);
+#if 0
+    // see https://github.com/Bodmer/TFT_eSPI/blob/master/User_Setup.h#L303
     sprite.setTextFont(4);
     sprite.setTextSize(2);
+#else
+    sprite.setFreeFont(&FreeSansBold18pt7b);
+    sprite.setTextSize(2);
+#endif
     sprite.setTextDatum(MC_DATUM);
     sprite.setTextColor(fg, bg);
     sprite.drawString(text, display.width() / 2, display.height() / 2);
